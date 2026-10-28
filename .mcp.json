@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "unity-editor-mcp": {
+      "type": "stdio",
+      "command": "C:\\Users\\aashi\\AppData\\Local\\Unity\\bin\\unity.exe",
+      "args": ["mcp", "--project-path", "P:\\NID\\Semester 3\\Level Design 3D\\Tejimola\\Tejimola Final\\Tejimola-main\\Tejimola-main\\Tejimola-main"]
+    }
+  }
+}
