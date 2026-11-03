@@ -35,6 +35,24 @@ public class EvaporateEffect : MonoBehaviour
     [SerializeField] private float duration = 3f;
     [Tooltip("0..1 of Duration: when the shrinking starts and when the piece is gone")]
     [SerializeField] private Vector2 shrinkWindow = new Vector2(0.25f, 0.85f);
+    [Tooltip("0..1 of Duration: each piece starts its shrink up to this much later than the others, " +
+             "so the form wastes away bit by bit instead of all at once")]
+    [Range(0f, 0.5f)] [SerializeField] private float stagger = 0f;
+
+    [Header("Slow pieces (e.g. the NPC vines)")]
+    [Tooltip("Pieces under these use Slow Shrink Window instead: they start early and linger the longest")]
+    [SerializeField] private Transform[] slowRoots;
+    [SerializeField] private Vector2 slowShrinkWindow = new Vector2(0.05f, 1f);
+
+    [Header("Sound")]
+    [Tooltip("Played together the moment the evaporation starts (e.g. a scream + crying)")]
+    [SerializeField] private AudioClip[] startSounds;
+    [Range(0f, 1f)] [SerializeField] private float startSoundsVolume = 1f;
+    [Tooltip("0 = heard the same everywhere (2D), 1 = positioned at this object (3D)")]
+    [Range(0f, 1f)] [SerializeField] private float startSoundsSpatialBlend = 0f;
+    [Tooltip("Seconds after the start before the sounds fade out (long clips like crying would otherwise run into the cutscene). 0 = play to the end")]
+    [SerializeField] private float startSoundsStopAfter = 3f;
+    [SerializeField] private float startSoundsFadeSeconds = 1.5f;
 
     public UnityEvent onEvaporated;
 
@@ -48,6 +66,7 @@ public class EvaporateEffect : MonoBehaviour
         public Vector3 startScale;
         public ParticleSystem vfx;
         public int stripToMaterialCount = -1;   // kept renderer: cut the material list to this length when gone
+        public Vector2 window;                   // this piece's own 0..1 shrink window (stagger / slow roots applied)
     }
 
     public void Play()
@@ -59,10 +78,12 @@ public class EvaporateEffect : MonoBehaviour
     private IEnumerator PlayRoutine()
     {
         IsPlaying = true;
+        PlayStartSounds();
         var pieces = CollectPieces();
 
         foreach (var p in pieces)
         {
+            p.window = PieceWindow(p.renderer.transform);
             Bounds b = p.renderer.bounds;
             if (evaporatePrefab != null)
             {
@@ -85,10 +106,10 @@ public class EvaporateEffect : MonoBehaviour
         for (float t = 0f; t < duration; t += Time.deltaTime)
         {
             float k = t / duration;
-            float s = 1f - Mathf.Clamp01(Mathf.InverseLerp(shrinkWindow.x, shrinkWindow.y, k));
-            s *= s;   // ease-in: holds its shape, then goes quickly
             foreach (var p in pieces)
             {
+                float s = 1f - Mathf.Clamp01(Mathf.InverseLerp(p.window.x, p.window.y, k));
+                s *= s;   // ease-in: holds its shape, then goes quickly
                 if (p.stripToMaterialCount >= 0)
                 {
                     if (s <= 0f) Strip(p);
@@ -168,10 +189,44 @@ public class EvaporateEffect : MonoBehaviour
         p.renderer.sharedMaterials = mats;
     }
 
-    private bool IsKept(Transform t)
+    // Slow roots get their own long window; everything else gets the normal one, shifted later by a random stagger
+    private Vector2 PieceWindow(Transform t)
     {
-        if (keep == null) return false;
-        foreach (var k in keep) if (k != null && (t == k || t.IsChildOf(k))) return true;
+        if (IsUnder(t, slowRoots)) return slowShrinkWindow;
+        float offset = Random.Range(0f, stagger);
+        return new Vector2(Mathf.Min(shrinkWindow.x + offset, 0.99f), Mathf.Min(shrinkWindow.y + offset, 1f));
+    }
+
+    private void PlayStartSounds()
+    {
+        if (startSounds == null || startSounds.Length == 0) return;
+        var source = gameObject.AddComponent<AudioSource>();
+        source.playOnAwake = false;
+        source.spatialBlend = startSoundsSpatialBlend;
+        foreach (var clip in startSounds) if (clip != null) source.PlayOneShot(clip, startSoundsVolume);
+        if (startSoundsStopAfter > 0f) StartCoroutine(FadeOutAndRemove(source));
+    }
+
+    // Separate coroutine: the sounds can outlive the evaporation (they fade under the fade to black)
+    private IEnumerator FadeOutAndRemove(AudioSource source)
+    {
+        yield return new WaitForSeconds(startSoundsStopAfter);
+        float startVolume = source.volume;
+        for (float t = 0f; t < startSoundsFadeSeconds; t += Time.deltaTime)
+        {
+            source.volume = Mathf.Lerp(startVolume, 0f, t / startSoundsFadeSeconds);
+            yield return null;
+        }
+        source.Stop();
+        Destroy(source);
+    }
+
+    private bool IsKept(Transform t) => IsUnder(t, keep);
+
+    private static bool IsUnder(Transform t, Transform[] parents)
+    {
+        if (parents == null) return false;
+        foreach (var k in parents) if (k != null && (t == k || t.IsChildOf(k))) return true;
         return false;
     }
 }

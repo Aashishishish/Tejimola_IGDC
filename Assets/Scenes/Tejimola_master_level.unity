@@ -1187,7 +1187,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.08
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -10591,7 +10591,7 @@ MonoBehaviour:
   requiredWeaponTag: Arriyal weapon
   hitCooldown: 0.35
   vineAnimator: {fileID: 160212460}
-  attackTrigger: {fileID: 27685848}
+  attackTrigger: {fileID: 1584788940}
   stunSeconds: 1.2
   stunAnimatorSpeed: 0.15
   harmlessWhileStunned: 1
@@ -18847,6 +18847,8 @@ MonoBehaviour:
   guardVines:
   - {fileID: 1210774499}
   - {fileID: 98850285}
+  - {fileID: 160212458}
+  - {fileID: 1802598304}
   gourd: {fileID: 321421068}
   collapseWhenGourdDrops:
   - {fileID: 378597210}
@@ -18861,6 +18863,7 @@ MonoBehaviour:
   evaporateDelay: 2.5
   cutscene: {fileID: 1549044510}
   cutsceneStartsAt: 0.75
+  holdBeforeFade: 0
   gourdExposedSound: {fileID: 0}
   gourdExposedVolume: 1
   onGourdExposed:
@@ -19855,7 +19858,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b1f44988e8a9fe4cb71dd64a2cd2ee8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StartOnTrigger
-  vineAnimator: {fileID: 98850282}
+  vineAnimator: {fileID: 1802598307}
   attackBoolName: isSlamming
   playerTag: Player
 --- !u!136 &290610680
@@ -45639,7 +45642,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.08
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -66490,7 +66493,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.08
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -104025,12 +104028,13 @@ MonoBehaviour:
   fadeFromBlackSeconds: 1.5
   fadeColor: {r: 0, g: 0, b: 0, a: 1}
   timeline: {fileID: 0}
-  placeholderTitle: CUTSCENE
-  placeholderText: '(placeholder)
+  placeholderTitle: FLASHBACK
+  placeholderText: 'The stepmother stands over her stepdaughter, torn vines in her
+    hand, scolding her.
 
-    The bottle gourd falls. Tejimola''s spirit
-    is set free from the vines.'
-  placeholderSeconds: 6
+    The father storms in, shields his daughter, and turns
+    his anger on the stepmother.'
+  placeholderSeconds: 9
   skipKey: 32
   cutsceneMusic: {fileID: 8300000, guid: bd545f2fe18b02449a53e90ad4c346a2, type: 3}
   cutsceneMusicVolume: 0.8
@@ -104070,6 +104074,16 @@ MonoBehaviour:
   maxFlakesPerSecondPerObject: 160
   duration: 3
   shrinkWindow: {x: 0.25, y: 0.85}
+  stagger: 0
+  slowRoots: []
+  slowShrinkWindow: {x: 0.05, y: 1}
+  startSounds:
+  - {fileID: 8300000, guid: b9d231596b811c54aa4bfbba8722d190, type: 3}
+  - {fileID: 8300000, guid: cb8509178b75f3b4f955b598ddaa4c68, type: 3}
+  startSoundsVolume: 1
+  startSoundsSpatialBlend: 0
+  startSoundsStopAfter: 3
+  startSoundsFadeSeconds: 1.5
   onEvaporated:
     m_PersistentCalls:
       m_Calls: []
@@ -106484,7 +106498,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b1f44988e8a9fe4cb71dd64a2cd2ee8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StartOnTrigger
-  vineAnimator: {fileID: 1210774497}
+  vineAnimator: {fileID: 160212460}
   attackBoolName: isSlamming
   playerTag: Player
 --- !u!136 &1584788941
@@ -120679,7 +120693,7 @@ MonoBehaviour:
   requiredWeaponTag: Arriyal weapon
   hitCooldown: 0.35
   vineAnimator: {fileID: 1802598307}
-  attackTrigger: {fileID: 157458359}
+  attackTrigger: {fileID: 290610679}
   stunSeconds: 1.2
   stunAnimatorSpeed: 0.15
   harmlessWhileStunned: 1

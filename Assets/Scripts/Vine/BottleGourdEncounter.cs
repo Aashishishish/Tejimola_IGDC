@@ -30,6 +30,8 @@ public class BottleGourdEncounter : MonoBehaviour
     [SerializeField] private CutsceneTransition cutscene;
     [Tooltip("0..1 of the evaporation: when the fade to black starts (before 1 = overlaps the end of the flakes)")]
     [Range(0f, 1f)] [SerializeField] private float cutsceneStartsAt = 0.75f;
+    [Tooltip("Extra seconds of quiet after the evaporation before the fade starts, so the player can take it in")]
+    [SerializeField] private float holdBeforeFade = 0f;
 
     [Header("Feedback")]
     [Tooltip("Optional: played at the gourd when the last vine is beaten")]
@@ -111,7 +113,7 @@ public class BottleGourdEncounter : MonoBehaviour
             evaporate.Play();
             evaporateTime = evaporate.Duration * cutsceneStartsAt;
         }
-        yield return new WaitForSeconds(evaporateTime);
+        yield return new WaitForSeconds(evaporateTime + holdBeforeFade);
 
         if (cutscene != null) cutscene.Play();
     }
